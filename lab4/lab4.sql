@@ -1,5 +1,5 @@
-#3.1 INSERT
-#3.1.a
+-- 3.1 INSERT
+-- 3.1.a
 INSERT INTO person
 VALUES (DEFAULT, 'Leanne', 'Graham', '2001-01-25', '17707368031', '40817810099910004312');
 
@@ -228,57 +228,57 @@ VALUES (DEFAULT, 1, 1, 'CHP 1', '2022-02-01', '2022-03-01', '2022-03-02 15:56', 
         'Republican Fund for Capital Repairs of Common Property in apartment buildings in the territory of the Mari Republic',
         '2022-02-01', '2022-03-01', '2022-03-02 10:50', 21.28);
 
-# 3.1.b
+-- 3.1.b
 INSERT INTO building (address, date_commissioning, type, owner, cost)
 VALUES ('Yoshkar-Ola, Chavayna boulevard 23, 424000', '2005-05-06', 'brick', 'OOO AA1', 23680311.99);
 
-# 3.1.c
+-- 3.1.c
 INSERT INTO building (type, owner, address, date_commissioning, cost)
 SELECT type, owner, address, date_commissioning, cost
 FROM apartment_building;
 
-#3.2 DELETE
-#3.2.a
+-- 3.2 DELETE
+-- 3.2.a
 TRUNCATE TABLE building;
 
-#3.2.b
+-- 3.2.b
 DELETE
 FROM building
 WHERE date_commissioning < '1900-01-01';
 
-#3.3 UPDATE
-#3.3.a
+-- 3.3 UPDATE
+-- 3.3.a
 UPDATE utility_rate
 SET price = price * 2;
 
-#3.3.b
+-- 3.3.b
 UPDATE service, flat
 SET service.rate_coefficient = service.rate_coefficient * 2
 WHERE service.id_utility_rate = 1
   AND flat.area > 100;
 
-#3.3.c
+-- 3.3.c
 UPDATE apartment_building
 SET owner = 'Moscow government',
     cost  = cost * 1.5
 WHERE id_apartment_building = 1;
 
-#3.4 SELECT
-#3.4.a
+-- 3.4 SELECT
+-- 3.4.a
 SELECT first_name, last_name
 FROM person;
 
-#3.4.b
+-- 3.4.b
 SELECT *
 FROM person;
 
-#3.4.c
+-- 3.4.c
 SELECT *
 FROM person
 WHERE date_birth > '1999-12-12';
 
-#3.5 SELECT ORDER BY + LIMIT
-#3.5.a
+-- 3.5 SELECT ORDER BY + LIMIT
+-- 3.5.a
 SELECT *
 FROM person
 ORDER BY first_name
@@ -299,18 +299,18 @@ LIMIT 5;
 #3.5.d
 SELECT *
 FROM person
-ORDER BY 4 DESC;
+ORDER BY 1 DESC;
 
 #3.6 Работа с датами
 #3.6.a
 SELECT *
 FROM payment
-WHERE datetime_payment > '2022-03-01 00:00';
+WHERE datetime_payment >= '2022-03-01 00:00';
 
 #3.6.b
 SELECT *
 FROM payment
-WHERE datetime_payment BETWEEN '2022-03-01 00:00' AND '2022-03-03 00:00';
+WHERE datetime_payment BETWEEN '2022-03-01 00:00' AND '2022-03-03 23:59';
 
 #3.6.c
 SELECT first_name, last_name, YEAR(date_birth) AS birth_year
@@ -349,23 +349,17 @@ FROM flat
 GROUP BY type
 HAVING COUNT(*) > 2;
 
-#
-SELECT id_flat, COUNT(*) AS count
-FROM service
-GROUP BY id_flat
-HAVING COUNT(*) > 1;
-
 # находим услуги, которые были подключены более чем к 10 квартирам
 SELECT id_utility_rate, COUNT(*) AS count
 FROM service
 GROUP BY id_utility_rate
-HAVING COUNT(*) > 10;
+HAVING count > 10;
 
 # находим квартиры, у которых больше 2 владельцев
 SELECT id_flat, COUNT(*) AS count
 FROM person_has_flat
 GROUP BY id_flat
-HAVING COUNT(*) > 2;
+HAVING count > 2;
 
 #3.9 SELECT JOIN
 /* 3.9.a */
