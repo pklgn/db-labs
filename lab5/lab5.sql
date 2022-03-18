@@ -115,19 +115,25 @@ WHERE '2019-03-23' BETWEEN rib.checkin_date AND rib.checkout_date
 GROUP BY rc.name;
 
 -- 5. Дать список последних проживавших клиентов по всем комнатам гостиницы “Космос”, выехавшим в апреле с указанием даты выезда.
-join (SELECT rib.id_room, MAX(checkout_date) FROM client
-LEFT JOIN booking b on client.id_client = b.id_client
-LEFT JOIN room_in_booking rib on b.id_booking = rib.id_booking
-WHERE MONTH(rib.checkout_date) = '4'
-  AND rib.id_room IN
-      (SELECT id_room
-       FROM room r
-       WHERE r.id_hotel IN
-             (SELECT id_hotel
-              FROM hotel h
-              WHERE h.name = 'Космос'))
-GROUP BY rib.id_room;
-) t1 on t1
+SELECT *
+FROM client c
+         JOIN booking b2 on c.id_client = b2.id_client
+         JOIN
+     (SELECT rib.id_room, rib.id_booking, MAX(checkout_date) max_checkout_date
+      FROM client
+               LEFT JOIN booking b on client.id_client = b.id_client
+               LEFT JOIN room_in_booking rib on b.id_booking = rib.id_booking
+      WHERE MONTH(rib.checkout_date) = '4'
+        AND rib.id_room IN
+            (SELECT id_room
+             FROM room r
+             WHERE r.id_hotel IN
+                   (SELECT id_hotel
+                    FROM hotel h
+                    WHERE h.name = 'Космос'))
+      GROUP BY rib.id_room
+     ) t1 ON b2.id_booking = t1.id_booking;
+
 -- 6.Продлить на 2 дня дату проживания в гостинице “Космос” всем клиентам комнат категории “Бизнес”, которые заселились 10мая.
 UPDATE room_in_booking rib
 SET rib.checkout_date = DATE_ADD(rib.checkout_date, INTERVAL 2 DAY)
