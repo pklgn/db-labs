@@ -95,12 +95,11 @@ WHERE c.id_client IN
 -- 3. Дать список свободных номеров всех гостиниц на 22 апреля
 SELECT *
 FROM room r
-WHERE r.id_room IN
+WHERE r.id_room NOT IN
       (SELECT rib.id_room
        FROM room_in_booking rib
-       WHERE checkin_date < '2019-04-22' or checkout_date > '2019-04-22'
-          -- checkin_date >= '2019-04-22' and checkout_date <= '2019-04-22')
-ORDER BY id_room;
+       WHERE '2019-04-22' BETWEEN checkin_date AND checkout_date)
+ORDER BY id_hotel;
 
 -- 4. Дать количество проживающих в гостинице “Космос” на 23 марта по каждой категории номеров
 SELECT rc.name, COUNT(*) count
