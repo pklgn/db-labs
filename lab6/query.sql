@@ -53,15 +53,12 @@ FROM `order` o
 GROUP BY p.id_company
 HAVING count > 120;
 
-/* 5. Дать списки сделавших заказы аптек по всем дилерам компании “AstraZeneca”. Если у дилера нет заказов,
- в названии аптеки проставить NULL
-*/
+-- 5. Дать списки сделавших заказы аптек по всем дилерам компании “AstraZeneca”. Если у дилера нет заказов, в названии аптеки проставить NULL
 SELECT p.name, d.name
 FROM `order` o
          JOIN pharmacy p on o.id_pharmacy = p.id_pharmacy
          RIGHT JOIN dealer d on d.id_dealer = o.id_dealer
-         JOIN company c on c.id_company = d.id_company AND c.name = 'AstraZeneca'
-GROUP BY d.name;
+         JOIN company c on c.id_company = d.id_company AND c.name = 'AstraZeneca';
 
 -- 6. Уменьшить на 20% стоимость всех лекарств, если она превышает 3000, а длительность лечения не более 7 дней
 UPDATE production p
