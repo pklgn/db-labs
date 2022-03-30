@@ -74,5 +74,11 @@ CREATE INDEX IX_production_price
 CREATE INDEX IX_medicine_cure_duration
     ON medicine (cure_duration);
 
+CREATE INDEX IX_medicine_name
+    ON medicine (name);
+
 CREATE INDEX IX_order_date
     ON `order` (date);
+
+CREATE INDEX IX_company_name
+    ON company (name);
