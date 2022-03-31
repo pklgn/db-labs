@@ -1,4 +1,4 @@
--- 1. Добавить внешние ключи
+-- 1. Р”РѕР±Р°РІРёС‚СЊ РІРЅРµС€РЅРёРµ РєР»СЋС‡Рё
 CREATE INDEX IX_lesson_id_subject
     ON lesson (id_subject);
 
@@ -42,20 +42,20 @@ ALTER TABLE mark
             ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- 2. Выдать оценки студентов по информатикеесли они обучаются данному предмету. Оформить выдачу данных с использованием view
+-- 2. Р’С‹РґР°С‚СЊ РѕС†РµРЅРєРё СЃС‚СѓРґРµРЅС‚РѕРІ РїРѕ РёРЅС„РѕСЂРјР°С‚РёРєРµРµСЃР»Рё РѕРЅРё РѕР±СѓС‡Р°СЋС‚СЃСЏ РґР°РЅРЅРѕРјСѓ РїСЂРµРґРјРµС‚Сѓ. РћС„РѕСЂРјРёС‚СЊ РІС‹РґР°С‡Сѓ РґР°РЅРЅС‹С… СЃ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј view
 CREATE VIEW informatics_mark AS
 SELECT st.name, m.mark, l.date
 FROM mark m
          JOIN lesson l ON m.id_lesson = l.id_lesson
-         JOIN subject st ON l.id_subject = st.id_subject AND st.name = 'Информатика'
+         JOIN subject st ON l.id_subject = st.id_subject AND st.name = 'РРЅС„РѕСЂРјР°С‚РёРєР°'
          JOIN student st ON m.id_student = st.id_student;
 
 SELECT *
 FROM informatics_mark;
 
 /*
- 3. Дать информацию о должниках с указанием фамилии студента и названия предмета. Должниками считаются студенты,
- не имеющие оценки по предмету,который ведется в группе. Оформить в виде процедуры, на входе идентификатор группы
+ 3. Р”Р°С‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РґРѕР»Р¶РЅРёРєР°С… СЃ СѓРєР°Р·Р°РЅРёРµРј С„Р°РјРёР»РёРё СЃС‚СѓРґРµРЅС‚Р° Рё РЅР°Р·РІР°РЅРёСЏ РїСЂРµРґРјРµС‚Р°. Р”РѕР»Р¶РЅРёРєР°РјРё СЃС‡РёС‚Р°СЋС‚СЃСЏ СЃС‚СѓРґРµРЅС‚С‹,
+ РЅРµ РёРјРµСЋС‰РёРµ РѕС†РµРЅРєРё РїРѕ РїСЂРµРґРјРµС‚Сѓ,РєРѕС‚РѕСЂС‹Р№ РІРµРґРµС‚СЃСЏ РІ РіСЂСѓРїРїРµ. РћС„РѕСЂРјРёС‚СЊ РІ РІРёРґРµ РїСЂРѕС†РµРґСѓСЂС‹, РЅР° РІС…РѕРґРµ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РіСЂСѓРїРїС‹
  */
 CREATE PROCEDURE get_bad_students(IN group_id INT)
 BEGIN
@@ -73,7 +73,7 @@ END;
 CALL get_bad_students(2);
 
 
--- 4. Дать среднюю оценку студентов по каждому предмету для тех предметов, по которым занимается не менее 35 студентов.
+-- 4. Р”Р°С‚СЊ СЃСЂРµРґРЅСЋСЋ РѕС†РµРЅРєСѓ СЃС‚СѓРґРµРЅС‚РѕРІ РїРѕ РєР°Р¶РґРѕРјСѓ РїСЂРµРґРјРµС‚Сѓ РґР»СЏ С‚РµС… РїСЂРµРґРјРµС‚РѕРІ, РїРѕ РєРѕС‚РѕСЂС‹Рј Р·Р°РЅРёРјР°РµС‚СЃСЏ РЅРµ РјРµРЅРµРµ 35 СЃС‚СѓРґРµРЅС‚РѕРІ.
 CREATE TEMPORARY TABLE subject_over_35_students
 SELECT sb.id_subject, sb.name, COUNT(DISTINCT s.id_student) AS count
 FROM `group` g
@@ -89,3 +89,24 @@ FROM subject_over_35_students
          JOIN student s ON s.id_group = l.id_group
          JOIN mark m ON l.id_lesson = m.id_lesson AND m.id_student = s.id_student
 GROUP BY subject_over_35_students.name;
+
+/*
+ 5. Р”Р°С‚СЊ РѕС†РµРЅРєРё СЃС‚СѓРґРµРЅС‚РѕРІ СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё Р’Рњ РїРѕ РІСЃРµРј РїСЂРѕРІРѕРґРёРјС‹Рј РїСЂРµРґРјРµС‚Р°Рј СЃ
+ СѓРєР°Р·Р°РЅРёРµРј РіСЂСѓРїРїС‹, С„Р°РјРёР»РёРё, РїСЂРµРґРјРµС‚Р°, РґР°С‚С‹. РџСЂРё РѕС‚СЃСѓС‚СЃС‚РІРёРё РѕС†РµРЅРєРё Р·Р°РїРѕР»РЅРёС‚СЊ
+ Р·РЅР°С‡РµРЅРёСЏРјРё NULL РїРѕР»СЏ РѕС†РµРЅРєРё.
+ */
+SELECT g.name, s.name, sb.name, l.date, m.mark
+FROM `group` g
+    JOIN lesson l ON g.id_group = l.id_group
+    JOIN student s ON g.id_group = s.id_group
+    JOIN subject sb ON l.id_subject = sb.id_subject
+    LEFT JOIN mark m ON l.id_lesson = m.id_lesson AND s.id_student = m.id_student
+WHERE g.name = 'Р’Рњ';
+
+-- 6. Р’СЃРµРј СЃС‚СѓРґРµРЅС‚Р°Рј СЃРїРµС†РёР°Р»СЊРЅРѕСЃС‚Рё РџРЎ, РїРѕР»СѓС‡РёРІС€РёРј РѕС†РµРЅРєРё РјРµРЅСЊС€РёРµ 5 РїРѕ РїСЂРµРґРјРµС‚Сѓ Р‘Р” РґРѕ 12.05, РїРѕРІС‹СЃРёС‚СЊ СЌС‚Рё РѕС†РµРЅРєРё РЅР° 1 Р±Р°Р»Р».
+UPDATE mark m
+    JOIN lesson l ON m.id_lesson = l.id_lesson AND l.date < '2019-05-12'
+    JOIN lab7.subject s ON l.id_subject = s.id_subject AND s.name = 'Р‘Р”'
+    JOIN `group` g ON l.id_group = g.id_group AND g.name = 'РџРЎ'
+SET m.mark = m.mark + 1
+WHERE m.mark < 5;
