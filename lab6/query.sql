@@ -85,5 +85,5 @@ CREATE INDEX IX_order_date
     ON `order` (date);
 
 -- Используется в запросах 2, 3, 5
-CREATE INDEX IX_company_id_company_name
-    ON company (id_company, name);
+CREATE INDEX IX_company_name
+    ON company (name);
