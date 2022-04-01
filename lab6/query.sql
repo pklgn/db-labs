@@ -68,17 +68,22 @@ WHERE p.price > 3000
   AND m.cure_duration <= 7;
 
 -- 7. Добавить необходимые индексы
+-- Используется в запросе 6
 CREATE INDEX IX_production_price
     ON production (price);
 
+-- Используется в запросе 6
 CREATE INDEX IX_medicine_cure_duration
     ON medicine (cure_duration);
 
+-- Используется в запросе 2, 3
 CREATE INDEX IX_medicine_name
     ON medicine (name);
 
+-- Используется в запросе 2, 3
 CREATE INDEX IX_order_date
     ON `order` (date);
 
-CREATE INDEX IX_company_name
-    ON company (name);
+-- Используется в запросах 2, 3, 5
+CREATE INDEX IX_company_id_company-name
+    ON company (id_company, name);
