@@ -1,19 +1,4 @@
 -- 1. Добавить внешние ключи
-CREATE INDEX IX_lesson_id_subject
-    ON lesson (id_subject);
-
-CREATE INDEX IX_lesson_id_teacher
-    ON lesson (id_teacher);
-
-CREATE INDEX IX_lesson_id_student
-    ON mark (id_student);
-
-CREATE INDEX IX_mark_id_lesson
-    ON mark (id_lesson);
-
-CREATE INDEX IX_student_id_group
-    ON student (id_group);
-
 ALTER TABLE lesson
     ADD CONSTRAINT FK_lesson_id_group
         FOREIGN KEY (id_group) REFERENCES `group` (id_group)
@@ -42,12 +27,12 @@ ALTER TABLE mark
             ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- 2. Выдать оценки студентов по информатикеесли они обучаются данному предмету. Оформить выдачу данных с использованием view
+-- 2. Выдать оценки студентов по информатике если они обучаются данному предмету. Оформить выдачу данных с использованием view
 CREATE VIEW informatics_mark AS
 SELECT st.name, m.mark, l.date
 FROM mark m
          JOIN lesson l ON m.id_lesson = l.id_lesson
-         JOIN subject st ON l.id_subject = st.id_subject AND st.name = 'Информатика'
+         JOIN subject sb ON l.id_subject = sb.id_subject AND sb.name = 'Информатика'
          JOIN student st ON m.id_student = st.id_student;
 
 SELECT *
@@ -70,8 +55,8 @@ BEGIN
           GROUP BY st.name, sb.id_subject
           HAVING max_mark IS NULL) t;
 END;
-CALL get_bad_students(2);
 
+CALL get_bad_students(2);
 
 -- 4. Дать среднюю оценку студентов по каждому предмету для тех предметов, по которым занимается не менее 35 студентов.
 CREATE TEMPORARY TABLE subject_over_35_students
@@ -95,18 +80,31 @@ GROUP BY subject_over_35_students.name;
  указанием группы, фамилии, предмета, даты. При отсутствии оценки заполнить
  значениями NULL поля оценки.
  */
-SELECT g.name, s.name, sb.name, l.date, m.mark
+SELECT g.name, st.name, sb.name, l.date, m.mark
 FROM `group` g
     JOIN lesson l ON g.id_group = l.id_group
-    JOIN student s ON g.id_group = s.id_group
+    JOIN student st ON g.id_group = st.id_group
     JOIN subject sb ON l.id_subject = sb.id_subject
-    LEFT JOIN mark m ON l.id_lesson = m.id_lesson AND s.id_student = m.id_student
+    LEFT JOIN mark m ON l.id_lesson = m.id_lesson AND st.id_student = m.id_student
 WHERE g.name = 'ВМ';
 
 -- 6. Всем студентам специальности ПС, получившим оценки меньшие 5 по предмету БД до 12.05, повысить эти оценки на 1 балл.
 UPDATE mark m
     JOIN lesson l ON m.id_lesson = l.id_lesson AND l.date < '2019-05-12'
-    JOIN lab7.subject s ON l.id_subject = s.id_subject AND s.name = 'БД'
+    JOIN subject sb ON l.id_subject = sb.id_subject AND sb.name = 'БД'
     JOIN `group` g ON l.id_group = g.id_group AND g.name = 'ПС'
 SET m.mark = m.mark + 1
 WHERE m.mark < 5;
+
+-- 7. Добавить необходимые индексы.
+-- Используется в запросах 5, 6
+CREATE INDEX IX_group_name
+    ON `group` (name);
+
+-- Используется в запросах 2, 6
+CREATE INDEX IX_subject_name
+    ON subject (name);
+
+-- Используется в запросе 6
+CREATE INDEX IX_lesson_date
+    ON lesson (date);
